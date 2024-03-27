@@ -3,10 +3,16 @@ import TextField from "@mui/material/TextField";
 import { Card, Typography } from "@mui/material";
 import { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { useSetRecoilState } from "recoil";
+import { userState } from "../store/atoms/user.js";
+import { BASE_URL } from "../config.js";
 
-function Signup() {
+function Signin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  const setUser = useSetRecoilState(userState);
 
   return (
     <div>
@@ -19,7 +25,7 @@ function Signup() {
         }}
       >
         <Typography variant={"h6"}>
-          Welcome to Coursera. Sign up below
+          Welcome to Coursera. Signin below
         </Typography>
       </div>
       <div style={{ display: "flex", justifyContent: "center" }}>
@@ -51,24 +57,33 @@ function Signup() {
             variant="contained"
             onClick={async () => {
               try {
-                const response = await axios.post(
-                  "http://localhost:3000/admin/signup",
+                const res = await axios.post(
+                  `${BASE_URL}/admin/signin`,
                   {
                     username: email,
                     password: password,
+                  },
+                  {
+                    headers: {
+                      "Content-type": "application/json",
+                    },
                   }
                 );
-                let data = response.data;
+                const data = res.data;
+
                 localStorage.setItem("token", data.token);
-                alert(data.message);
-                window.location = "/";
+                // window.location = "/"
+                setUser({
+                  userEmail: email,
+                  isLoading: false,
+                });
+                navigate("/courses");
               } catch (error) {
                 alert(error.response.data.message);
-                window.location = "/signup";
               }
             }}
           >
-            Signup
+            Signin
           </Button>
         </Card>
       </div>
@@ -76,4 +91,4 @@ function Signup() {
   );
 }
 
-export default Signup;
+export default Signin;

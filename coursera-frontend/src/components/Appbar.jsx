@@ -1,29 +1,20 @@
 import {Typography} from "@mui/material";
 import Button from "@mui/material/Button";
-import { useEffect, useState } from "react";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { isUserLoading } from "../store/selectors/isUserLoading";
+import {useSetRecoilState, useRecoilValue} from "recoil";
+import { userState } from "../store/atoms/user.js";
+import { userEmailState } from "../store/selectors/userEmail"
 
-function Appbar() {
+function Appbar({}) {
     const navigate = useNavigate()
-    const [userEmail, setUserEmail] = useState(null);
+    const userLoading = useRecoilValue(isUserLoading);
+    const userEmail = useRecoilValue(userEmailState);
+    const setUser = useSetRecoilState(userState);
 
-    useEffect(() => {
-        function callback2(data) {
-            if (data.username) {
-                setUserEmail(data.username)
-            }
-        }
-        function callback1(res) {
-            res.json().then(callback2)
-        }
-        // console.log("token - " + localStorage.getItem("token"));
-        fetch("http://localhost:3000/admin/me", {
-            method: "GET",
-            headers: {
-                "Authorization": "Bearer " + localStorage.getItem("token")
-            }
-        }).then(callback1)
-    }, []);
+    if (userLoading) {
+        return <></>
+    }
 
     if (userEmail) {
         return <div style={{
@@ -32,7 +23,9 @@ function Appbar() {
             padding: 4,
             zIndex: 1
         }}>
-            <div style={{marginLeft: 10}}>
+            <div style={{marginLeft: 10, cursor: "pointer"}} onClick={() => {
+                navigate("/")
+            }}>
                 <Typography variant={"h6"}>Coursera</Typography>
             </div>
     
@@ -58,7 +51,11 @@ function Appbar() {
                         variant={"contained"}
                         onClick={() => {
                             localStorage.setItem("token", null);
-                            window.location = "/";
+                            setUser({
+                                isLoading: false,
+                                userEmail: null
+                            })
+                            navigate('/')
                         }}
                     >Logout</Button>
                 </div>
@@ -71,7 +68,9 @@ function Appbar() {
             padding: 4,
             zIndex: 1
         }}>
-            <div style={{marginLeft: 10}}>
+            <div style={{marginLeft: 10, cursor: "pointer"}} onClick={() => {
+                navigate("/")
+            }}>
                 <Typography variant={"h6"}>Coursera</Typography>
             </div>
     
