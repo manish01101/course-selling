@@ -19,7 +19,7 @@ function Signin() {
         }}
       >
         <Typography variant={"h6"}>
-          Welcome to Coursera. Sign up below
+          Welcome to Coursera. Sign in below
         </Typography>
       </div>
       <div style={{ display: "flex", justifyContent: "center" }}>
@@ -51,8 +51,8 @@ function Signin() {
             size={"large"}
             variant="contained"
             onClick={async () => {
-              const res = await axios.post(
-                "http://localhost:3000/admin/login",
+              const response = await axios.post(
+                "http://localhost:3000/admin/signin",
                 {
                   username: email,
                   password: password,
@@ -63,13 +63,11 @@ function Signin() {
                   },
                 }
               );
-              const data = res.data;
-
+              const data = response.data;
               localStorage.setItem("token", data.token);
               window.location = "/";
             }}
           >
-            {" "}
             Signin
           </Button>
         </Card>
