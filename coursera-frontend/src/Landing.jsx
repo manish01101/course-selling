@@ -22,7 +22,7 @@ export function Landing() {
           zIndex: 2,
         }}
       >
-        <div style={{ display: "flex", justifyContent: "center", paddingTop: "15vh" }}>
+        <div style={{ display: "flex", justifyContent: "center", paddingTop: "15vh", paddingLeft: "6vw"}}>
           <Typography variant="h2">Welcome to Coursera.</Typography>
         </div>
       </Card>
