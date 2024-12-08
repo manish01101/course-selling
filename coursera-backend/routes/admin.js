@@ -1,77 +1,116 @@
-const mongoose = require("mongoose");
-const express = require('express');
-const { User, Course, Admin } = require("../db");
-const jwt = require('jsonwebtoken');
-const { SECRET } = require("../middleware/auth")
-const { authenticateJwt } = require("../middleware/auth");
+const express = require("express");
+const { Course, Admin } = require("../db");
+const jwt = require("jsonwebtoken");
+const { ADMIN_SECRET } = require("../config");
+const { userSchemaType, courseSchemaType } = require("../types");
 
-const router = express.Router();
+const adminRouter = express.Router();
 
-router.get("/me", authenticateJwt, async (req, res) => {
-    const admin = await Admin.findOne({ username: req.user.username });
-    if (!admin) {
-      res.status(403).json({msg: "Admin doesnt exist"})
-      return
-    }
-    res.json({
-        username: admin.username
-    })
+adminRouter.get("/me", authenticateAdmin, async (req, res) => {
+  const admin = await Admin.findOne({ username: req.user.username });
+  if (!admin) {
+    return res.status(403).json({ msg: "Admin doesnt exist" });
+  }
+  res.json({
+    username: admin.username,
+  });
 });
 
-router.post('/signup', (req, res) => {
-    const { username, password } = req.body;
-    function callback(admin) {
-      if (admin) {
-        res.status(403).json({ message: 'Admin already exists' });
-      } else {
-        const obj = { username: username, password: password };
-        const newAdmin = new Admin(obj);
-        newAdmin.save();
+adminRouter.post("/signup", async (req, res) => {
+  const parsedBody = userSchemaType.safeParse(req.body);
+  if (!parsedBody.success) {
+    return res
+      .status(400)
+      .json({ message: "Invalid input data", errors: parsedBody.error.errors });
+  }
 
-        const token = jwt.sign({ username, role: 'admin' }, SECRET, { expiresIn: '1h' });
-        
-        res.json({ message: 'Admin created successfully', token });
-      }
-  
+  const { username, password } = parsedBody.data;
+  try {
+    const admin = await Admin.findOne({ username });
+    if (admin) {
+      return res.status(403).json({ message: "Admin already exists" });
     }
-    Admin.findOne({ username }).then(callback);
-  });
-  
-  router.post('/signin', async (req, res) => {
-    const { username, password } = req.body;
+    const newAdmin = new Admin({ username, password });
+    await newAdmin.save();
+
+    const token = jwt.sign({ username, role: "admin" }, SECRET, {
+      expiresIn: "24h",
+    });
+    return res.json({ message: "Admin created successfully", token });
+  } catch (err) {
+    console.error("Error during admin signup:", err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+adminRouter.post("/signin", async (req, res) => {
+  const parsedBody = userSchemaType.safeParse(req.body);
+  if (!parsedBody.success) {
+    return res
+      .status(400)
+      .json({ message: "Invalid input data", errors: parsedBody.error.errors });
+  }
+
+  const { username, password } = parsedBody.data;
+  try {
     const admin = await Admin.findOne({ username, password });
     if (admin) {
-      const token = jwt.sign({ username, role: 'admin' }, SECRET, { expiresIn: '1h' });
-      res.json({ message: 'Logged in successfully', token });
+      const token = jwt.sign({ username, role: "admin" }, ADMIN_SECRET, {
+        expiresIn: "24h",
+      });
+      res.json({ message: "Logged in successfully", token });
     } else {
-      res.status(403).json({ message: 'Invalid username or password' });
+      res.status(403).json({ message: "Invalid username or password" });
     }
-  });
-  
-  router.post('/courses', authenticateJwt, async (req, res) => {
-    const course = new Course(req.body);
-    await course.save();
-    res.json({ message: 'Course created successfully', courseId: course.id });
-  });
-  
-  router.put('/courses/:courseId', authenticateJwt, async (req, res) => {
-    const course = await Course.findByIdAndUpdate(req.params.courseId, req.body, { new: true });
-    if (course) {
-      res.json({ message: 'Course updated successfully' });
-    } else {
-      res.status(404).json({ message: 'Course not found' });
-    }
-  });
-  
-  router.get('/courses', authenticateJwt, async (req, res) => {
-    const courses = await Course.find({});
-    res.json({ courses });
-  });
-  
-  router.get('/course/:courseId', authenticateJwt, async (req, res) => {
-    const courseId = req.params.courseId;
-    const course = await Course.findById(courseId);
-    res.json({ course });
-  });
+  } catch (err) {
+    console.error("Error during admin signin:", err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
 
-  module.exports = router
+adminRouter.post("/courses", authenticateAdmin, async (req, res) => {
+  const parsedBody = courseSchemaType.safeParse(req.body);
+  if (!parsedBody.success) {
+    return res
+      .status(400)
+      .json({ message: "Invalid input data", errors: parsedBody.error.errors });
+  }
+
+  const newCourse = new Course(parsedBody);
+  await newCourse.save();
+  res.json({ message: "Course created successfully", courseId: newCourse.id });
+});
+
+adminRouter.put("/courses/:courseId", authenticateAdmin, async (req, res) => {
+  const parsedBody = courseSchemaType.safeParse(req.body);
+  if (!parsedBody.success) {
+    return res
+      .status(400)
+      .json({ message: "Invalid input data", errors: parsedBody.error.errors });
+  }
+  const course = await Course.findByIdAndUpdate(
+    req.params.courseId,
+    parsedBody,
+    {
+      new: true,
+    }
+  );
+  if (course) {
+    res.json({ message: "Course updated successfully" });
+  } else {
+    res.status(404).json({ message: "Course not found" });
+  }
+});
+
+adminRouter.get("/courses", authenticateAdmin, async (req, res) => {
+  const courses = await Course.find({});
+  res.json({ courses });
+});
+
+adminRouter.get("/course/:courseId", authenticateAdmin, async (req, res) => {
+  const courseId = req.params.courseId;
+  const course = await Course.findById(courseId);
+  res.json({ course });
+});
+
+module.exports = adminRouter;
