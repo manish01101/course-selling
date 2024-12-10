@@ -1,17 +1,17 @@
-const mongoose = require("mongoose");
+import { Schema, model } from "mongoose";
 // Define mongoose schemas
-const userSchema = new mongoose.Schema({
+const userSchema = new Schema({
   username: { type: String },
   password: String,
-  purchasedCourses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Course" }],
+  purchasedCourses: [{ type: Schema.Types.ObjectId, ref: "Course" }],
 });
 
-const adminSchema = new mongoose.Schema({
+const adminSchema = new Schema({
   username: String,
   password: String,
 });
 
-const courseSchema = new mongoose.Schema({
+const courseSchema = new Schema({
   title: String,
   description: String,
   price: Number,
@@ -19,12 +19,6 @@ const courseSchema = new mongoose.Schema({
   published: Boolean,
 });
 
-const User = mongoose.model("User", userSchema);
-const Admin = mongoose.model("Admin", adminSchema);
-const Course = mongoose.model("Course", courseSchema);
-
-module.exports = {
-  User,
-  Admin,
-  Course,
-};
+export const User = model("User", userSchema);
+export const Admin = model("Admin", adminSchema);
+export const Course = model("Course", courseSchema);

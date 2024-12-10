@@ -1,9 +1,10 @@
-const z = require("zod");
+import { z } from "zod";
 
 export const userSchemaType = z.object({
   username: z
     .string()
-    .min(5, { message: "Username must be at least 5 characters long" }),
+    .min(5, { message: "Username must be at least 5 characters long" })
+    .max(20),
   password: z
     .string()
     .min(5, { message: "Password must be at least 5 characters long" }),
