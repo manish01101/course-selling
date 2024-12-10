@@ -1,9 +1,9 @@
+import { Admin, Course } from "../db/index.js";
+import jwt from "jsonwebtoken";
+import { ADMIN_SECRET } from "../config.js";
+import { userSchemaType, courseSchemaType } from "../types/index.js";
 import { Router } from "express";
-import { Course, Admin } from "../db";
-import { sign } from "jsonwebtoken";
-import { ADMIN_SECRET } from "../config";
-import { userSchemaType, courseSchemaType } from "../types";
-import { authenticateAdmin } from "../middleware/auth";
+import { authenticateAdmin } from "../middleware/auth.js";
 
 const adminRouter = Router();
 
@@ -41,7 +41,7 @@ adminRouter.post("/signup", async (req, res) => {
     const newAdmin = new Admin({ username, password });
     await newAdmin.save();
 
-    const token = sign({ username, role: "admin" }, SECRET, {
+    const token = jwt.sign({ username, role: "admin" }, ADMIN_SECRET, {
       expiresIn: "24h",
     });
     return res.json({ message: "Admin created successfully", token });
@@ -63,7 +63,7 @@ adminRouter.post("/signin", async (req, res) => {
   try {
     const admin = await Admin.findOne({ username, password });
     if (admin) {
-      const token = sign({ username, role: "admin" }, ADMIN_SECRET, {
+      const token = jwt.sign({ username, role: "admin" }, ADMIN_SECRET, {
         expiresIn: "24h",
       });
       res.json({ message: "Logged in successfully", token });
@@ -135,7 +135,7 @@ adminRouter.get("/courses", authenticateAdmin, async (req, res) => {
   }
 });
 
-adminRouter.get("/course/:courseId", authenticateAdmin, async (req, res) => {
+adminRouter.get("/courses/:courseId", authenticateAdmin, async (req, res) => {
   try {
     const course = await Course.findById(req.params.courseId);
     if (!course) {

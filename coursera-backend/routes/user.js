@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { authenticateUser } from "../middleware/auth";
-import { Course, User } from "../db";
-import { userSchemaType } from "../types";
+import { Course, User } from "../db/index.js";
+import { userSchemaType } from "../types/index.js";
 import jwt from "jsonwebtoken";
-import { USER_SECRET } from "../config";
+import { USER_SECRET } from "../config.js";
+import { authenticateUser } from "../middleware/auth.js";
 
 const userRouter = Router();
 
