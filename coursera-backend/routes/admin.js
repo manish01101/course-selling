@@ -84,7 +84,7 @@ adminRouter.post("/courses", authenticateAdmin, async (req, res) => {
       .json({ message: "Invalid input data", errors: parsedBody.error.errors });
   }
   try {
-    const newCourse = new Course(parsedBody);
+    const newCourse = new Course(parsedBody.data);
     await newCourse.save();
     res.json({
       message: "Course created successfully",
