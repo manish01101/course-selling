@@ -148,4 +148,20 @@ adminRouter.get("/courses/:courseId", authenticateAdmin, async (req, res) => {
   }
 });
 
+adminRouter.delete("/courses/:courseId", authenticateAdmin, async (req, res) => {
+    try {
+      const course = await Course.findByIdAndDelete(req.params.courseId);
+      if (!course) {
+        return res
+          .status(404)
+          .json({ message: "Course not found" });
+      }
+      res.json({ message: course.title + ": deleted successfully", id: course._id });
+    } catch (err) {
+      console.error("Error while deleting course", err);
+      return res.status(500).json({ message: "Error while deleting course" });
+    }
+  }
+);
+
 export default adminRouter;
