@@ -1,4 +1,4 @@
-import { Typography, Button, CircularProgress } from "@mui/material";
+import { Typography, Button, CircularProgress, Tooltip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { isUserLoading } from "../store/selectors/isUserLoading";
 import { useSetRecoilState, useRecoilValue } from "recoil";
@@ -10,6 +10,7 @@ function Appbar() {
   const userLoading = useRecoilValue(isUserLoading);
   const userEmail = useRecoilValue(userEmailState);
   const setUser = useSetRecoilState(userState);
+  const role = localStorage.getItem("Role");
 
   if (userLoading) {
     return (
@@ -52,13 +53,39 @@ function Appbar() {
       <div style={{ display: "flex", gap: "1rem" }}>
         {userEmail ? (
           <>
-            <Button onClick={() => navigate("/addcourse")}>Add Course</Button>
-            <Button onClick={() => navigate("/courses")}>Courses</Button>
+            <Tooltip title={`Go to ${role} dashboard`}>
+              <Typography
+                variant="h6"
+                onClick={() => {
+                  navigate(`/${role}`);
+                }}
+                sx={{
+                  cursor: "pointer",
+                  color: "primary.main",
+                  textAlign: "center",
+                  padding: "8px 16px",
+                  borderRadius: "8px",
+                  transition: "background-color 0.3s ease, transform 0.3s ease",
+                  "&:hover": {
+                    backgroundColor: "rgba(0, 0, 0, 0.1)",
+                    transform: "scale(1.05)",
+                  },
+                }}
+              >
+                {userEmail}
+              </Typography>
+            </Tooltip>
+
             <Button
               variant="contained"
               onClick={() => {
                 localStorage.removeItem("token");
-                setUser({ isLoading: false, userEmail: null });
+                localStorage.removeItem("Role");
+                setUser({
+                  isLoading: false,
+                  userEmail: null,
+                  userType: null,
+                });
                 navigate("/");
               }}
             >
