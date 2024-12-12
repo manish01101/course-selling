@@ -1,99 +1,83 @@
-import {Typography} from "@mui/material";
-import Button from "@mui/material/Button";
+import { Typography, Button, CircularProgress } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { isUserLoading } from "../store/selectors/isUserLoading";
-import {useSetRecoilState, useRecoilValue} from "recoil";
+import { useSetRecoilState, useRecoilValue } from "recoil";
 import { userState } from "../store/atoms/user.js";
-import { userEmailState } from "../store/selectors/userEmail"
+import { userEmailState } from "../store/selectors/userEmail";
 
-function Appbar({}) {
-    const navigate = useNavigate()
-    const userLoading = useRecoilValue(isUserLoading);
-    const userEmail = useRecoilValue(userEmailState);
-    const setUser = useSetRecoilState(userState);
+function Appbar() {
+  const navigate = useNavigate();
+  const userLoading = useRecoilValue(isUserLoading);
+  const userEmail = useRecoilValue(userEmailState);
+  const setUser = useSetRecoilState(userState);
 
-    if (userLoading) {
-        return <></>
-    }
+  if (userLoading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "4rem",
+          backgroundColor: "#fff",
+        }}
+      >
+        <CircularProgress size={24} />
+      </div>
+    );
+  }
 
-    if (userEmail) {
-        return <div style={{
-            display: "flex",
-            justifyContent: "space-between",
-            padding: 4,
-            zIndex: 1
-        }}>
-            <div style={{marginLeft: 10, cursor: "pointer"}} onClick={() => {
-                navigate("/")
-            }}>
-                <Typography variant={"h6"}>Coursera</Typography>
-            </div>
-    
-            <div style={{display: "flex"}}>
-                <div style={{marginRight: 10, display: "flex"}}>
-                <div style={{marginRight: 10}}>
-                        <Button
-                            onClick={() => {
-                                navigate("/addcourse")
-                            }}
-                        >Add course</Button>
-                    </div>
+  return (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        padding: "0.5rem 1rem",
+        backgroundColor: "#fff",
+        boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+        zIndex: 1,
+      }}
+    >
+      {/* Logo */}
+      <Typography
+        variant="h6"
+        style={{ cursor: "pointer" }}
+        onClick={() => navigate("/")}
+      >
+        Coursera
+      </Typography>
 
-                    <div style={{marginRight: 10}}>
-                        <Button
-                            onClick={() => {
-                                navigate("/courses")
-                            }}
-                        >Courses</Button>
-                    </div>
-
-                    <Button
-                        variant={"contained"}
-                        onClick={() => {
-                            localStorage.setItem("token", null);
-                            setUser({
-                                isLoading: false,
-                                userEmail: null
-                            })
-                            navigate('/')
-                        }}
-                    >Logout</Button>
-                </div>
-            </div>
-        </div>
-    } else {
-        return <div style={{
-            display: "flex",
-            justifyContent: "space-between",
-            padding: 4,
-            zIndex: 1
-        }}>
-            <div style={{marginLeft: 10, cursor: "pointer"}} onClick={() => {
-                navigate("/")
-            }}>
-                <Typography variant={"h6"}>Coursera</Typography>
-            </div>
-    
-            <div style={{display: "flex"}}>
-                <div style={{marginRight: 10}}>
-                    <Button
-                        variant={"contained"}
-                        onClick={() => {
-                            navigate("/signup")
-                        }}
-                    >Signup</Button>
-                </div>
-                <div>
-                    <Button
-                        variant={"contained"}
-                        onClick={() => {
-                            navigate("/signin")
-                        }}
-                    >Signin</Button>
-                </div>
-            </div>
-        </div>
-    }
+      {/* Conditional Buttons of signup, signin, logout */}
+      <div style={{ display: "flex", gap: "1rem" }}>
+        {userEmail ? (
+          <>
+            <Button onClick={() => navigate("/addcourse")}>Add Course</Button>
+            <Button onClick={() => navigate("/courses")}>Courses</Button>
+            <Button
+              variant="contained"
+              onClick={() => {
+                localStorage.removeItem("token");
+                setUser({ isLoading: false, userEmail: null });
+                navigate("/");
+              }}
+            >
+              Logout
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button variant="contained" onClick={() => navigate("/signup")}>
+              Signup
+            </Button>
+            <Button variant="contained" onClick={() => navigate("/signin")}>
+              Signin
+            </Button>
+          </>
+        )}
+      </div>
+    </div>
+  );
 }
 
 export default Appbar;

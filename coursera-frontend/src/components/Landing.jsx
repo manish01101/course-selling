@@ -21,7 +21,7 @@ export const Landing = () => {
         backgroundColor: "#f5f5f5",
       }}
     >
-      <Grid container style={{ height: "100%"}}>
+      <Grid container style={{ height: "100%" }}>
         <Grid
           item
           xs={12}
