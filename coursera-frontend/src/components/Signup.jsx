@@ -1,18 +1,23 @@
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
-import { Card, Typography } from "@mui/material";
+import {
+  Card,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Typography,
+} from "@mui/material";
 import { useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config.js";
 import { useNavigate } from "react-router-dom";
-import { useSetRecoilState } from "recoil";
-import { userState } from "../store/atoms/user.js";
 
 function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState("");
   const navigate = useNavigate();
-  const setUser = useSetRecoilState(userState);
 
   return (
     <div>
@@ -51,21 +56,34 @@ function Signup() {
           />
           <br />
           <br />
+          <FormControl fullWidth>
+            <InputLabel>Role</InputLabel>
+            <Select
+              label="Role"
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+            >
+              <MenuItem value="user">User</MenuItem>
+              <MenuItem value="admin">Admin</MenuItem>
+            </Select>
+          </FormControl>
+          <br />
+          <br />
 
           <Button
             size={"large"}
             variant="contained"
             onClick={async () => {
               try {
-                const response = await axios.post(`${BASE_URL}/admin/signup`, {
-                  username: email,
-                  password: password,
-                });
-                let data = response.data;
-                localStorage.setItem("token", data.token);
-                // window.location = "/"
-                setUser({ userEmail: email, isLoading: false });
-                navigate("/courses");
+                const response = await axios.post(
+                  `${BASE_URL}/api/v1/${role}/signup`,
+                  {
+                    username: email,
+                    password: password,
+                  }
+                );
+                alert(response.data.message);
+                navigate("/signin");
               } catch (error) {
                 alert(error.response.data.message);
               }

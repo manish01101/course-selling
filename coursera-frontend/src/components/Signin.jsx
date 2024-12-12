@@ -1,16 +1,24 @@
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
-import { Card, Typography } from "@mui/material";
+import {
+  Card,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Typography,
+} from "@mui/material";
 import { useState } from "react";
 import axios from "axios";
+import { BASE_URL } from "../config.js";
 import { useNavigate } from "react-router-dom";
 import { useSetRecoilState } from "recoil";
 import { userState } from "../store/atoms/user.js";
-import { BASE_URL } from "../config.js";
 
-function Signin() {
+function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState("");
   const navigate = useNavigate();
   const setUser = useSetRecoilState(userState);
 
@@ -25,14 +33,14 @@ function Signin() {
         }}
       >
         <Typography variant={"h6"}>
-          Welcome to Coursera. Signin below
+          Welcome to Coursera. Sign in below.
         </Typography>
       </div>
       <div style={{ display: "flex", justifyContent: "center" }}>
         <Card varint={"outlined"} style={{ width: 400, padding: 20 }}>
           <TextField
-            onChange={(e) => {
-              setEmail(e.target.value);
+            onChange={(event) => {
+              setEmail(event.target.value);
             }}
             fullWidth={true}
             label="Email"
@@ -51,33 +59,40 @@ function Signin() {
           />
           <br />
           <br />
+          <FormControl fullWidth>
+            <InputLabel>Role</InputLabel>
+            <Select
+              label="Role"
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+            >
+              <MenuItem value="user">User</MenuItem>
+              <MenuItem value="admin">Admin</MenuItem>
+            </Select>
+          </FormControl>
+          <br />
+          <br />
 
           <Button
             size={"large"}
             variant="contained"
             onClick={async () => {
               try {
-                const res = await axios.post(
-                  `${BASE_URL}/admin/signin`,
+                const response = await axios.post(
+                  `${BASE_URL}/api/v1/${role}/signin`,
                   {
                     username: email,
                     password: password,
-                  },
-                  {
-                    headers: {
-                      "Content-type": "application/json",
-                    },
                   }
                 );
-                const data = res.data;
-
+                let data = response.data;
                 localStorage.setItem("token", data.token);
+                localStorage.setItem("Role", role);
+                setUser({ userEmail: email, isLoading: false, userRole: role });
                 // window.location = "/"
-                setUser({
-                  userEmail: email,
-                  isLoading: false,
-                });
-                navigate("/courses");
+                {
+                  role === "user" ? navigate("/user") : navigate("/admin");
+                }
               } catch (error) {
                 alert(error.response.data.message);
               }
@@ -91,4 +106,4 @@ function Signin() {
   );
 }
 
-export default Signin;
+export default Signup;
