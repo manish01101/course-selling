@@ -106,7 +106,7 @@ adminRouter.put("/courses/:courseId", authenticateAdmin, async (req, res) => {
   try {
     const course = await Course.findByIdAndUpdate(
       req.params.courseId,
-      parsedBody,
+      parsedBody.data,
       {
         new: true,
       }
