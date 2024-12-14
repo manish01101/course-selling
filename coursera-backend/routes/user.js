@@ -86,6 +86,19 @@ userRouter.get("/courses", authenticateUser, async (req, res) => {
   }
 });
 
+userRouter.get("/courses/:courseId", authenticateUser, async (req, res) => {
+  try {
+    const course = await Course.findById(req.params.courseId);
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+    res.json({ course });
+  } catch (error) {
+    console.error("Error during fetching course", error);
+    return res.status(500).json({ message: "Error during fetching course" });
+  }
+});
+
 userRouter.post("/courses/:courseId", authenticateUser, async (req, res) => {
   try {
     const course = await Course.findById(req.params.courseId);
@@ -119,5 +132,38 @@ userRouter.get("/purchasedCourses", authenticateUser, async (req, res) => {
     return res.status(500).json({ message: "Error during fetching courses" });
   }
 });
+
+userRouter.get(
+  "/purchasedCourses/:courseId",
+  authenticateUser,
+  async (req, res) => {
+    try {
+      const { courseId } = req.params;
+      const user = await User.findOne({ username: req.user.username }).populate(
+        "purchasedCourses"
+      );
+
+      if (!user) {
+        return res.status(403).json({ message: "User not found" });
+      }
+
+      // find the specific course in the user's purchased courses
+      const purchasedCourse = user.purchasedCourses.find(
+        (course) => course._id.toString() === courseId
+      );
+
+      if (!purchasedCourse) {
+        return res
+          .status(404)
+          .json({ message: "Course not found in purchased courses" });
+      }
+
+      res.json({ purchasedCourse });
+    } catch (error) {
+      console.error("Error during fetching course", error);
+      return res.status(500).json({ message: "Error during fetching course" });
+    }
+  }
+);
 
 export default userRouter;
