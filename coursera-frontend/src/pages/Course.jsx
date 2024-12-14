@@ -72,44 +72,90 @@ const Course = () => {
             padding: 20,
           }}
         >
-          <UpdateCourseButton
-            course={course}
-            onCourseUpdated={fetchCourseData}
-          />
-
-          {/* deleting course */}
-          <Button
-            variant="outlined"
-            color="error"
-            onClick={async () => {
-              const isConfirmed = window.confirm(
-                "Are you sure you want to delete this course?"
-              );
-              if (!isConfirmed) {
-                return;
-              }
-
-              try {
-                const response = await axios.delete(
-                  `${BASE_URL}/api/v1/${role}/courses/${courseId}`,
-                  {
-                    headers: {
-                      Authorization: `Bearer ${localStorage.getItem("token")}`,
-                    },
+          {role === "admin" ? (
+            // admin
+            <>
+              <UpdateCourseButton
+                course={course}
+                onCourseUpdated={fetchCourseData}
+              />
+              {/* deleting course */}
+              <Button
+                variant="outlined"
+                color="error"
+                onClick={async () => {
+                  const isConfirmed = window.confirm(
+                    "Are you sure you want to delete this course?"
+                  );
+                  if (!isConfirmed) {
+                    return;
                   }
+
+                  try {
+                    const response = await axios.delete(
+                      `${BASE_URL}/api/v1/${role}/courses/${courseId}`,
+                      {
+                        headers: {
+                          Authorization: `Bearer ${localStorage.getItem(
+                            "token"
+                          )}`,
+                        },
+                      }
+                    );
+                    console.log(response.data);
+                    alert("Course: " + response.data.message);
+                    navigate("/admin/courses");
+                  } catch (error) {
+                    console.error("Failed to delete course", error);
+                  }
+                }}
+              >
+                <Typography component="div">
+                  <Box sx={{ fontWeight: "bold", m: 1 }}>Delete</Box>
+                </Typography>
+              </Button>
+            </>
+          ) : (
+            // user
+            <Button
+              variant="contained"
+              size="large"
+              onClick={async () => {
+                const isConfirmed = window.confirm(
+                  "Are you sure you want to buy this course?"
                 );
-                console.log(response.data);
-                alert("Course: " + response.data.message);
-                navigate("/admin/courses");
-              } catch (error) {
-                console.error("Failed to delete course", error);
-              }
-            }}
-          >
-            <Typography component="div">
-              <Box sx={{ fontWeight: "bold", m: 1 }}>Delete</Box>
-            </Typography>
-          </Button>
+                if (!isConfirmed) {
+                  return;
+                }
+                try {
+                  const response = await axios.post(
+                    `${BASE_URL}/api/v1/${role}/courses/${courseId}`,
+                    {}, // Body is empty for this request
+                    {
+                      headers: {
+                        Authorization: `Bearer ${localStorage.getItem(
+                          "token"
+                        )}`,
+                      },
+                    }
+                  );
+                  console.log(response.data);
+                  setTimeout(() => {
+                    alert("Course: " + response.data.message);
+                    navigate("/user/purchasedCourses");
+                  }, 400);
+                } catch (error) {
+                  console.error("Failed to buy course", error);
+                  alert(
+                    error.response?.data?.message ||
+                      "An error occurred. Please try again."
+                  );
+                }
+              }}
+            >
+              Buy
+            </Button>
+          )}
         </div>
       </Card>
     </div>
