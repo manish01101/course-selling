@@ -9,9 +9,12 @@ import axios from "axios";
 import { BASE_URL } from "./config.js";
 import { useEffect } from "react";
 import Admin from "./pages/Admin.jsx";
-import AdminCourses from "./pages/AdminCourses.jsx";
 import Course from "./pages/Course.jsx";
 import AddCourse from "./pages/AddCourse.jsx";
+import User from "./pages/User.jsx";
+import Courses from "./pages/Courses.jsx";
+import PurchasedCourses from "./pages/PurchasedCourses.jsx";
+import PurchasedCourse from "./pages/PurchasedCourse.jsx";
 
 function App() {
   return (
@@ -27,9 +30,20 @@ function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/signin" element={<Signin />} />
             <Route path="/admin" element={<Admin />} />
-            <Route path="/admin/courses" element={<AdminCourses />} />
+            <Route path="/admin/courses" element={<Courses />} />
             <Route path="/admin/courses/:courseId" element={<Course />} />
             <Route path="/admin/addcourse" element={<AddCourse />} />
+            <Route path="/user" element={<User />} />
+            <Route path="/user/courses" element={<Courses />} />
+            <Route path="/user/courses/:courseId" element={<Course />} />
+            <Route
+              path="/user/purchasedCourses"
+              element={<PurchasedCourses />}
+            />
+            <Route
+              path="/user/purchasedCourses/:courseId"
+              element={<PurchasedCourse />}
+            />
           </Routes>
         </Router>
       </div>
