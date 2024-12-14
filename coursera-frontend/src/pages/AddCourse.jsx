@@ -1,6 +1,6 @@
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import { Card } from "@mui/material";
+import { Card, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import { useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config.js";
@@ -11,6 +11,7 @@ function AddCourse() {
   const [description, setDescription] = useState("");
   const [image, setImage] = useState("");
   const [price, setPrice] = useState(0);
+  const [published, setPublished] = useState(false);
   const navigate = useNavigate();
 
   return (
@@ -66,7 +67,18 @@ function AddCourse() {
             label="Price"
             variant="outlined"
           />
-          
+          <FormControl fullWidth style={{ marginBottom: 10 }}>
+            <InputLabel>Publish</InputLabel>
+            <Select
+              label="Publish"
+              value={published}
+              onChange={(e) => setPublished(e.target.value)}
+            >
+              <MenuItem value={true}>Yes</MenuItem>
+              <MenuItem value={false}>No</MenuItem>
+            </Select>
+          </FormControl>
+
           {/* adding course */}
           <Button
             size={"large"}
@@ -79,7 +91,7 @@ function AddCourse() {
                     title: title,
                     description: description,
                     imageLink: image,
-                    published: true,
+                    published: published,
                     price: parseFloat(price),
                   },
                   {
