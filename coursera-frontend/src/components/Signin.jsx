@@ -88,6 +88,7 @@ function Signup() {
                 let data = response.data;
                 localStorage.setItem("token", data.token);
                 localStorage.setItem("Role", role);
+                localStorage.setItem("type", role);
                 setUser({ userEmail: email, isLoading: false, userRole: role });
                 // window.location = "/"
                 {

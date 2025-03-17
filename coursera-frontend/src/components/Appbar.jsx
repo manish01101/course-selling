@@ -53,6 +53,25 @@ function Appbar() {
       <div style={{ display: "flex", gap: "1rem" }}>
         {userEmail ? (
           <>
+            <Typography
+              variant="h6"
+              onClick={() => {
+                navigate(`/${role}`);
+              }}
+              sx={{
+                cursor: "pointer",
+                textAlign: "center",
+                padding: "8px 16px",
+                borderRadius: "8px",
+                transition: "background-color 0.3s ease, transform 0.3s ease",
+                "&:hover": {
+                  backgroundColor: "rgba(0, 0, 0, 0.1)",
+                  transform: "scale(1.05)",
+                },
+              }}
+            >
+              {`${role} Dashboard`}
+            </Typography>
             <Tooltip title={`Go to ${role} dashboard`}>
               <Typography
                 variant="h6"

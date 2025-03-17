@@ -22,11 +22,18 @@ const Courses = () => {
 
   return (
     <div
-      style={{ display: "flex", flexWrap: "wrap", justifyContent: "center" }}
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        justifyContent: "center",
+        gap: "1.5rem",
+        alignItems: "stretch",
+        padding: "2rem",
+      }}
     >
-      {courses.map((course, index) => {
-        return <CourseCard course={course} key={index} />;
-      })}
+      {courses.map((course, index) => (
+        <CourseCard course={course} key={index} />
+      ))}
     </div>
   );
 };

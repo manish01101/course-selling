@@ -35,6 +35,14 @@ const Admin = () => {
         >
           Add Course
         </Button>
+        <Button
+          variant="outlined"
+          color="secondary"
+          onClick={() => navigate("/admin/courses")}
+          style={{ padding: "10px 20px" }}
+        >
+          Update Course
+        </Button>
       </Stack>
     </Container>
   );
